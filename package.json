@@ -1,9 +1,10 @@
 {
   "name": "pg-aura",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Simplified PostgreSQL client",
   "main": "index.js",
   "author": "Vitalius Kuchalskis <qualphey@gmail.com>",
+  "repository": "https://github.com/Qualphey/pg-aura",
   "scripts": {
     "babel": "babel --presets es2015 js/main.js -o build/main.bundle.js"
   },
