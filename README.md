@@ -46,14 +46,16 @@ Insert by passing an argument object with at least one value named same as one c
     
 ### table.select("columns"[], "where", values[mixed])
 Select rows from a table.
-
-Arguments:
   
-columns: "string" || array["string"] i.e. "\*" || ["column_name"],
-    
-where: "string" i.e. "column_a = $1 OR column_b = $2",
-    
-values: array[mixed] i.e. ["One", 2] these values will represent parameters ($1, $2) used in where condition
+#### columns:
+"string" || array["string"] i.e. "\*" || ["column_name"]
+
+
+#### where:
+"string" i.e. "column_a = $1 OR column_b = $2"
+
+#### values:
+array[mixed] i.e. ["One", 2] these values will represent parameters ($1, $2) used in where condition
 
   ```javascript
     var auras = await table.select(
@@ -75,13 +77,14 @@ values: array[mixed] i.e. ["One", 2] these values will represent parameters ($1,
 ### table.update(set{obj}, "where", values[mixed])
 Update rows within a table.
 
-Arguments:
+#### set:
+{obj}  i.e. { column_name: "new value" }
 
-set: {obj}  i.e. { column_name: "new value" },
+#### where:
+"string" i.e. "column_a = $1 OR column_b = $2"
 
-where: "string" i.e. "column_a = $1 OR column_b = $2",
-
-values: array[mixed] i.e. ["One", 2] these values will represent parameters ($1, $2) used in where condition
+#### values:
+array[mixed] i.e. ["One", 2] these values will represent parameters ($1, $2) used in where condition
 
   ```javascript
     await table.update(
@@ -93,9 +96,11 @@ values: array[mixed] i.e. ["One", 2] these values will represent parameters ($1,
 ### table.delete("where", values[mixed])
 Delete rows within a table.
 
-Arguments:
+#### where:
+"string" i.e. "column_a = $1 OR column_b = $2"
 
-where: "string" i.e. "column_a = $1 OR column_b = $2",
+#### values:
+array[mixed] i.e. ["One", 2] these values will represent parameters ($1, $2) used in where condition
 
 values: array[mixed] i.e. ["One", 2] these values will represent parameters ($1, $2) used in where condition
 
