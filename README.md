@@ -8,7 +8,7 @@ The main purpose of this library is to provide ease of use and to protect your d
 ```
 
 ## Usage
-```
+```javascript
 (async function() {
   var aura = await require('pg-aura').connect({
     db_host: "127.0.0.1",
@@ -36,13 +36,14 @@ The main purpose of this library is to provide ease of use and to protect your d
   ### table.insert( {obj} );
     Insert by passing an argument object with at least one value named same as one column from the table.
 
-    ```
+    ```javascript
       const id = await table.insert({
         name: "Aura",
         big_int: 987654321,
         text_array: ["One", "Two", "Three"]
       });
     ```
+    
   ### table.select("columns"[], "where", values[mixed])
     Select rows from a table.
     Arguments:
@@ -50,7 +51,7 @@ The main purpose of this library is to provide ease of use and to protect your d
       where: "string" i.e. "column_a = $1 OR column_b = $2",
       values: array[mixed] i.e. ["One", 2] these values will represent parameters ($1, $2) used in where condition
 
-    ```
+    ```javascript
       var auras = await table.select(
         ['name', 'float', 'big_int', 'text_array'],
         "name = $1",
@@ -74,22 +75,22 @@ The main purpose of this library is to provide ease of use and to protect your d
         where: "string" i.e. "column_a = $1 OR column_b = $2",
         values: array[mixed] i.e. ["One", 2] these values will represent parameters ($1, $2) used in where condition
 
-    ```
-      await table.update(
-        { name: "NEW NAME", float: 4.842 },
-        "name = $1",
-        ["Aura"]
-      );
-    ```
+      ```javascript
+        await table.update(
+          { name: "NEW NAME", float: 4.842 },
+          "name = $1",
+          ["Aura"]
+        );
+      ```
     ### table.delete("where", values[mixed])
       Delete rows within a table.
       Arguments:
         where: "string" i.e. "column_a = $1 OR column_b = $2",
         values: array[mixed] i.e. ["One", 2] these values will represent parameters ($1, $2) used in where condition
 
-    ```
-      await table.delete(
-        "name = $1",
-        ["Aura"]
-      );
+      ```javascript
+        await table.delete(
+          "name = $1",
+          ["Aura"]
+        );
     ```
