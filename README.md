@@ -43,10 +43,10 @@ Insert by passing an argument object with at least one value named same as one c
       text_array: ["One", "Two", "Three"]
     });
   ```
-    
+
 ### table.select("columns"[], "where", values[mixed])
 Select rows from a table.
-  
+
 #### columns:
 "string" || array["string"] i.e. "\*" || ["column_name"]
 
@@ -72,7 +72,7 @@ array[mixed] i.e. ["One", 2] these values will represent parameters ($1, $2) use
 
     // OR
 
-    var auras = table.select('*');
+    var auras = await table.select('*');
   ```
 ### table.update(set{obj}, "where", values[mixed])
 Update rows within a table.

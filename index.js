@@ -20,6 +20,8 @@ module.exports = class {
 
   static async connect(cfg) {
     try {
+        console.log("AURA CONNECT", cfg);
+
       var init_client = new Client({
         user: cfg.db_super_usr,
         password: cfg.db_super_pwd,
@@ -35,7 +37,6 @@ module.exports = class {
       })
 
       var exists = await init_client.query("SELECT datname FROM pg_catalog.pg_database WHERE lower(datname) = lower('"+cfg.db_name+"')");
-
 
       if (exists.rowCount == 0) {
         await init_client.query("CREATE DATABASE "+cfg.db_name+";");
@@ -71,6 +72,8 @@ module.exports = class {
 
 //+-+-+-+-+-+-+-+-+-+-+-+-+-
 
+      console.log("CONNECTING TO DB", cfg.db_name);
+
       const pool = new Pool({
         user: cfg.db_name,
         password: cfg.db_super_pwd,
@@ -86,9 +89,12 @@ module.exports = class {
 
       var this_class = new module.exports();
       this_class.client = await pool.connect();
-      
+
       return this_class;
-    } catch (e) { console.error(e.stack) }
+    } catch (e) {
+      console.error(e.stack);
+      process.exit(-1);
+    }
   }
 
   async table(name, context) {

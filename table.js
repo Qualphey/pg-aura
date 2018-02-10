@@ -5,6 +5,8 @@ var nunjucks_env = new nunjucks.Environment(new nunjucks.FileSystemLoader(__dirn
   noCache: true
 }));
 
+var fs = require('fs');
+
 module.exports = class {
   constructor(name, context, client, nunjucks) {
     this.name = name;
@@ -100,14 +102,16 @@ module.exports = class {
         console.log("arg_types", arg_types);
 
         if (!this.prepared_statements.select.includes(prepared_statement)) {
-          console.log(arg_types);
-          var prep_sql = nunjucks_env.render('select.sql', {
+          var select_cfg = {
             table: this.name,
             columns: columns,
             prepared_statement: prepared_statement,
             arg_types: arg_types,
             condition: condition_sql
-          });
+          };
+          console.log("SELECT CFG", select_cfg);
+
+          var prep_sql = nunjucks_env.render('select.sql', select_cfg);
           console.log(prep_sql);
           await this.client.query(prep_sql);
           this.prepared_statements.select.push(prepared_statement);
