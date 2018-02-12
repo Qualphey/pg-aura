@@ -44,10 +44,10 @@ module.exports = class {
 
   async insert(obj) {
     try {
+      console.log("INSERT", obj);
       var prepared_statement = this.name+'_insert_cols';
       var columns = this.get_columns(obj);
       var values = [];
-      console.log("COLUMNS", columns);
       for (var c = 0; c < columns.length; c++) {
         prepared_statement += '_'+columns[c].name;
           if (obj[columns[c].name]) {
@@ -60,15 +60,15 @@ module.exports = class {
           table: this.name,
           columns: columns
         });
-        console.log(prep_sql);
+      //  console.log(prep_sql);
         await this.client.query(prep_sql);
         this.prepared_statements.insert.push(prepared_statement);
       }
 
       var arg_str = this.prepare_arg_string(values);
-      console.log("ARG STR", arg_str);
+    //  console.log("ARG STR", arg_str);
       var qstr = "EXECUTE "+prepared_statement+arg_str;
-      console.log(qstr);
+    //  console.log(qstr);
       return (await this.client.query(qstr)).rows[0].id;
     } catch (e) {
       console.error(e.stack);
@@ -78,6 +78,9 @@ module.exports = class {
 
   async select(what, where, values) {
     try {
+      console.log("SELECT", what);
+      console.log("WHERE", where);
+      console.log("VALUES", values);
       var prepared_statement = this.name+'_select_cols';
       var columns = this.get_columns(what);
       if (what != "*") {
@@ -94,12 +97,10 @@ module.exports = class {
         where = where.replace(' )', ')');
         var condition = this.prepare_condition(where);
         condition_sql = condition.sql;
-        console.log("WHERE", condition.id);
 
         prepared_statement += '_where_'+condition.id;
 
         arg_types = this.parse_conditions(where);
-        console.log("arg_types", arg_types);
 
         if (!this.prepared_statements.select.includes(prepared_statement)) {
           var select_cfg = {
@@ -109,10 +110,9 @@ module.exports = class {
             arg_types: arg_types,
             condition: condition_sql
           };
-          console.log("SELECT CFG", select_cfg);
 
           var prep_sql = nunjucks_env.render('select.sql', select_cfg);
-          console.log(prep_sql);
+      //    console.log(prep_sql);
           await this.client.query(prep_sql);
           this.prepared_statements.select.push(prepared_statement);
         }
@@ -120,12 +120,12 @@ module.exports = class {
         var argument_string = this.prepare_arg_string(values);
 
         var qstr = "EXECUTE "+prepared_statement+argument_string;
-        console.log(qstr);
+      //  console.log(qstr);
         return (await this.client.query(qstr)).rows;
       } else {
         var qstr = "SELECT ";
-        console.log("WHAT:", what);
-        console.log("qstr:", qstr);
+      //  console.log("WHAT:", what);
+      //  console.log("qstr:", qstr);
         if (what === '*') {
           qstr += '*';
         } else {
@@ -138,7 +138,7 @@ module.exports = class {
         }
         qstr += ' FROM '+this.name;
 
-        console.log(qstr);
+    //    console.log(qstr);
         return (await this.client.query(qstr)).rows;
       }
     } catch (e) {
@@ -149,6 +149,7 @@ module.exports = class {
 
   async update(set, where, values) {
     try {
+      console.log("UPDATE", set, "WHERE", where, "VALUES", values);
       var prepared_statement = this.name+'_update_cols_';
       var set_param_types = [];
 
@@ -189,7 +190,7 @@ module.exports = class {
           arg_types: arg_types,
           condition: condition.sql
         });
-        console.log(prep_sql);
+      //  console.log(prep_sql);
         await this.client.query(prep_sql);
         this.prepared_statements.update.push(prepared_statement);
       }
@@ -197,8 +198,7 @@ module.exports = class {
       var argument_string = this.prepare_arg_string(values);
 
       var qstr = "EXECUTE "+prepared_statement+argument_string;
-      console.log(qstr);
-      console.log("HERE");
+    //  console.log(qstr);
       return (await this.client.query(qstr)).rows;
     } catch (e) {
       console.error(e.stack);
@@ -208,6 +208,8 @@ module.exports = class {
 
   async delete(where, values) {
     try {
+      console.log("DELETE WHERE", where, "VALUES", values);
+
       var prepared_statement = this.name+'_delete_where_';
 
       where = where.replace(/\s\s+/g, ' ');
