@@ -1,6 +1,6 @@
 {
   "name": "pg-aura",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Simplified PostgreSQL client",
   "main": "index.js",
   "author": "Vitalius Kuchalskis <qualphey@gmail.com>",

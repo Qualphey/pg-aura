@@ -45,9 +45,7 @@ module.exports = class {
         await init_client.query("GRANT ALL PRIVILEGES ON DATABASE "+cfg.db_name+" to "+cfg.db_name+";");
       }
 
-      init_client.end()
-        .then(() => console.log('initialisation db client has disconnected'))
-        .catch(err => console.error('error during disconnection', err.stack))
+      init_client.end().catch(err => console.error('error during disconnection', err.stack))
 
 
       init_client = new Client({
@@ -66,9 +64,7 @@ module.exports = class {
 
       await init_client.query('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
 
-      init_client.end()
-        .then(() => console.log('initialisation db client has disconnected'))
-        .catch(err => console.error('error during disconnection', err.stack))
+      init_client.end().catch(err => console.error('error during disconnection', err.stack))
 
 //+-+-+-+-+-+-+-+-+-+-+-+-+-
 

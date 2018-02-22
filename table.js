@@ -34,17 +34,16 @@ module.exports = class {
 
   async init() {
     try {
-      console.log("INITIALISING", this.name, "TABLE");
-      console.log(this.sql);
       await this.client.query(this.sql);
     } catch (e) {
+      console.log("INITIALISING", this.name, "TABLE");
+      console.log(this.sql);
       console.log(e);
     }
   }
 
   async insert(obj) {
     try {
-      console.log("INSERT", obj);
       var prepared_statement = this.name+'_insert_cols';
       var columns = this.get_columns(obj);
       var values = [];
@@ -71,6 +70,7 @@ module.exports = class {
     //  console.log(qstr);
       return (await this.client.query(qstr)).rows[0].id;
     } catch (e) {
+      console.log("INSERT", obj);
       console.error(e.stack);
       return false;
     }
@@ -78,9 +78,6 @@ module.exports = class {
 
   async select(what, where, values) {
     try {
-      console.log("SELECT", what);
-      console.log("WHERE", where);
-      console.log("VALUES", values);
       var prepared_statement = this.name+'_select_cols';
       var columns = this.get_columns(what);
       if (what != "*") {
@@ -142,6 +139,9 @@ module.exports = class {
         return (await this.client.query(qstr)).rows;
       }
     } catch (e) {
+      console.log("SELECT", what);
+      console.log("WHERE", where);
+      console.log("VALUES", values);
       console.error(e.stack);
       return false;
     }
@@ -149,7 +149,6 @@ module.exports = class {
 
   async update(set, where, values) {
     try {
-      console.log("UPDATE", set, "WHERE", where, "VALUES", values);
       var prepared_statement = this.name+'_update_cols_';
       var set_param_types = [];
 
@@ -201,6 +200,7 @@ module.exports = class {
     //  console.log(qstr);
       return (await this.client.query(qstr)).rows;
     } catch (e) {
+      console.log("UPDATE", set, "WHERE", where, "VALUES", values);
       console.error(e.stack);
       return false;
     }
@@ -208,7 +208,6 @@ module.exports = class {
 
   async delete(where, values) {
     try {
-      console.log("DELETE WHERE", where, "VALUES", values);
 
       var prepared_statement = this.name+'_delete_where_';
 
@@ -239,6 +238,7 @@ module.exports = class {
       console.log(qstr);
       return (await this.client.query(qstr)).rows;
     } catch (e) {
+      console.log("DELETE WHERE", where, "VALUES", values);
       console.error(e.stack);
       return false;
     }
@@ -325,7 +325,7 @@ module.exports = class {
   }
 
   prepare_arg_string(values) {
-    console.log("PREPARE ARG STRING", values);
+//    console.log("PREPARE ARG STRING", values);
     if (values) {
       var string = '(';
       var first_value = true;
@@ -361,7 +361,7 @@ module.exports = class {
   }
 
   parse_conditions(str) {
-  console.log(str);
+//  console.log(str);
     var result = [];
     function set_param_column(param, column) {
       param = parseInt(parameter.replace('$', ''));
@@ -383,10 +383,10 @@ module.exports = class {
 
     var regex = /((\w*) *(?:ALL|IN|<=|>=|!=|<>|@>|<@|&&|\|\||<|>|=) *(\$\d*|\w*\s?\(\$\d*\)))/g;
     var match;
-    console.log("REGEX",regex.exec(""));
+  //  console.log("REGEX",regex.exec(""));
     while (match = regex.exec(str)) {
       var column = match [2];
-      console.log(column);
+  //    console.log(column);
       var parameter = match[3];
       set_param_column(parameter, column);
     }
