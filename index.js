@@ -20,8 +20,6 @@ module.exports = class {
 
   static async connect(cfg) {
     try {
-        console.log("AURA CONNECT", cfg);
-
       var init_client = new Client({
         user: cfg.db_super_usr,
         password: cfg.db_super_pwd,
@@ -85,6 +83,7 @@ module.exports = class {
 
       var this_class = new module.exports();
       this_class.client = await pool.connect();
+      this_class.db_name = cfg.db_name;
 
       return this_class;
     } catch (e) {

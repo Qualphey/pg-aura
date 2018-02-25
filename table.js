@@ -227,7 +227,7 @@ module.exports = class {
           arg_types: arg_types,
           condition: condition.sql
         });
-        console.log(prep_sql);
+      //  console.log(prep_sql);
         await this.client.query(prep_sql);
         this.prepared_statements.delete.push(prepared_statement);
       }
@@ -235,7 +235,7 @@ module.exports = class {
       var argument_string = this.prepare_arg_string(values);
 
       var qstr = "EXECUTE "+prepared_statement+argument_string;
-      console.log(qstr);
+  //    console.log(qstr);
       return (await this.client.query(qstr)).rows;
     } catch (e) {
       console.log("DELETE WHERE", where, "VALUES", values);
