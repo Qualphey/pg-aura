@@ -43,8 +43,10 @@ module.exports = class {
   }
 
   async insert(obj) {
+    let prepared_statement_sql;
+    let query_string;
     try {
-      var prepared_statement = this.name+'_insert_cols';
+      let prepared_statement = this.name+'_insert_cols';
       var columns = this.get_columns(obj);
       var values = [];
       for (var c = 0; c < columns.length; c++) {
@@ -55,22 +57,24 @@ module.exports = class {
       }
 
       if (!this.prepared_statements.insert.includes(prepared_statement)) {
-        var prep_sql = nunjucks_env.render('insert.sql', {
+        prepared_statement_sql = nunjucks_env.render('insert.sql', {
           table: this.name,
           columns: columns
         });
-      //  console.log(prep_sql);
-        await this.client.query(prep_sql);
+        await this.client.query(prepared_statement_sql);
         this.prepared_statements.insert.push(prepared_statement);
       }
 
       var arg_str = this.prepare_arg_string(values);
-    //  console.log("ARG STR", arg_str);
-      var qstr = "EXECUTE "+prepared_statement+arg_str;
-    //  console.log(qstr);
-      return (await this.client.query(qstr)).rows[0].id;
+      query_string = "EXECUTE "+prepared_statement+arg_str;
+      return (await this.client.query(query_string)).rows[0].id;
     } catch (e) {
       console.log("INSERT", obj);
+      console.log("PREPARED STATEMENT");
+      console.log(prepared_statement_sql);
+      console.log("");
+      console.log("QUERY STRING");
+      console.log(query_string);
       console.error(e.stack);
       return false;
     }
@@ -349,6 +353,8 @@ module.exports = class {
             }
           }
           string += "]";
+        } else if (value && typeof value === 'object' && value.constructor === Object) {
+          string += "'"+JSON.stringify(value)+"'::JSONB";
         } else {
           string += value;
         }
