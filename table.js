@@ -14,11 +14,8 @@ module.exports = class {
     for (var key in context.columns) {
       this.columns.push({ name: key, type: context.columns[key]});
     }
-    context.columns = this.columns;
-    context.table = name;
-    this.sql = nunjucks.render('init.sql', context);
 
-    this.columns.push({ name: 'id', type: 'uuid'});
+    context.table = name;
 
     context.table = name;
     this.client = client;
@@ -30,15 +27,87 @@ module.exports = class {
       update: [],
       delete: []
     };
+
+    this.context = context;
+    this.nunjucks = nunjucks;
   }
 
   async init() {
     try {
+      let existing = await this.client.query("SELECT column_name, data_type from information_schema.columns where table_name = '"+this.name+"';");
+
+      for (var c = 0; c < this.columns.length; c++) {
+        var column = this.columns[c];
+
+        if (column.type === 'uuid') {
+          column.default = "PRIMARY KEY DEFAULT gen_random_uuid()";
+        }
+      }
+
+      this.context.columns = this.columns;
+
+      if (existing.rows.length > 0) {
+        this.context.alter_columns = [];
+        this.context.add_columns = [];
+        this.context.drop_columns = [];
+
+        for (var r = 0; r < existing.rows.length; r++) {
+          let row = existing.rows[r];
+
+          var drop = true;
+          for (var c = 0; c < this.columns.length; c++) {
+            var column = this.columns[c];
+            column.name = column.name.toLowerCase();
+            column.type = column.type.toLowerCase();
+
+            if (column.name === row.column_name) {
+              drop = false;
+            }
+          }
+
+          if (drop) {
+            var column = {
+              name: row.column_name,
+              type: row.data_type
+            };
+            this.context.drop_columns.push(column);
+          }
+        }
+
+        for (var c = 0; c < this.columns.length; c++) {
+          var column = this.columns[c];
+    //      column.name = column.name.toLowerCase();
+    //      column.type = column.type.toLowerCase();
+
+          var add = true;
+          for (var r = 0; r < existing.rows.length; r++) {
+            let row = existing.rows[r];
+
+            if (row.column_name === 'id' && row.data_type === 'integer') {
+              row.data_type = 'serial';
+            }
+
+            if (column.name === row.column_name) {
+              add = false;
+              if (column.type != row.data_type && this.context.force_alter) {
+                this.context.alter_columns.push(column);
+              }
+            }
+          }
+
+          if (add) {
+            this.context.add_columns.push(column);
+          }
+        }
+      }
+
+      this.sql = this.nunjucks.render('init.sql', this.context);
+
       await this.client.query(this.sql);
     } catch (e) {
       console.log("INITIALISING", this.name, "TABLE");
       console.log(this.sql);
-      console.log(e);
+      console.log(e.stack);
     }
   }
 
@@ -72,7 +141,6 @@ module.exports = class {
       console.log("INSERT", obj);
       console.log("PREPARED STATEMENT");
       console.log(prepared_statement_sql);
-      console.log("");
       console.log("QUERY STRING");
       console.log(query_string);
       console.error(e.stack);
@@ -81,6 +149,8 @@ module.exports = class {
   }
 
   async select(what, where, values) {
+    let query_string;
+    let prepared_sql;
     try {
       var prepared_statement = this.name+'_select_cols';
       var columns = this.get_columns(what);
@@ -113,6 +183,7 @@ module.exports = class {
           };
 
           var prep_sql = nunjucks_env.render('select.sql', select_cfg);
+          prepared_sql = prep_sql;
       //    console.log(prep_sql);
           await this.client.query(prep_sql);
           this.prepared_statements.select.push(prepared_statement);
@@ -121,6 +192,7 @@ module.exports = class {
         var argument_string = this.prepare_arg_string(values);
 
         var qstr = "EXECUTE "+prepared_statement+argument_string;
+        query_string = qstr;
       //  console.log(qstr);
         return (await this.client.query(qstr)).rows;
       } else {
@@ -140,18 +212,27 @@ module.exports = class {
         qstr += ' FROM '+this.name;
 
     //    console.log(qstr);
+        query_string = qstr;
         return (await this.client.query(qstr)).rows;
       }
     } catch (e) {
-      console.log("SELECT", what);
-      console.log("WHERE", where);
-      console.log("VALUES", values);
+      console.error("table.select");
+      if (prepared_sql) {
+        console.log("prepared statement");
+        console.log(prepared_sql);
+      }
+
+      console.log("query string");
+      console.log(query_string);
+
       console.error(e.stack);
       return false;
     }
   }
 
   async update(set, where, values) {
+    let query_string;
+    let prepared_sql;
     try {
       var prepared_statement = this.name+'_update_cols_';
       var set_param_types = [];
@@ -194,6 +275,7 @@ module.exports = class {
           condition: condition.sql
         });
       //  console.log(prep_sql);
+      prepared_sql = prep_sql;
         await this.client.query(prep_sql);
         this.prepared_statements.update.push(prepared_statement);
       }
@@ -202,9 +284,14 @@ module.exports = class {
 
       var qstr = "EXECUTE "+prepared_statement+argument_string;
     //  console.log(qstr);
+      query_string = qstr;
       return (await this.client.query(qstr)).rows;
     } catch (e) {
-      console.log("UPDATE", set, "WHERE", where, "VALUES", values);
+      if (prepared_sql) {
+        console.log("prep SQL", prepared_sql);
+      }
+
+      console.log("QSTR", query_string);
       console.error(e.stack);
       return false;
     }
