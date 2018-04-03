@@ -104,6 +104,12 @@ module.exports = class {
       this.sql = this.nunjucks.render('init.sql', this.context);
 
       await this.client.query(this.sql);
+
+      for (var c = 0; c < this.columns.length; c++) {
+        if (this.columns[c].type === "serial") {
+          this.columns[c].type = "bigint";
+        }
+      }
     } catch (e) {
       console.log("INITIALISING", this.name, "TABLE");
       console.log(this.sql);
