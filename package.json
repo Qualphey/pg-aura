@@ -1,17 +1,14 @@
 {
   "name": "pg-aura",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Simplified PostgreSQL client",
   "main": "index.js",
   "author": "Vitalius Kuchalskis <qualphey@gmail.com>",
   "repository": "https://github.com/Qualphey/pg-aura",
-  "scripts": {
-    "babel": "babel --presets es2015 js/main.js -o build/main.bundle.js"
-  },
   "dependencies": {
-    "babel-core": "^6.25.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-2": "^6.24.1",
-    "nunjucks": "^2.0.0"
+    "pg": "^7.4.3",
+    "babel-core": "^6.26.3",
+    "babel-preset-env": "^1.7.0",
+    "nunjucks": "^3.0.1"
   }
 }

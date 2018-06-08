@@ -155,6 +155,7 @@ module.exports = class {
   }
 
   async select(what, where, values) {
+
     let query_string;
     let prepared_sql;
     try {
