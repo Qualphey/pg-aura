@@ -1,3 +1,5 @@
+## This repository has been [moved to GitLab](https://gitlab.com/subtledev/pg-aura) ##
+
 # pg-aura
 Simplified PostgreSQL client built using [node-postgres](https://github.com/brianc/node-postgres)
 
